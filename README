@@ -1,0 +1,6 @@
+description:
+
+sig:  Multiple prosite motifs searching.
+
+sig searches for multiples prosite motifs in a (set of) sequence.
+

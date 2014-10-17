@@ -1,0 +1,201 @@
+
+=head1 NAME
+
+=over 4
+
+=item B<sig> - Multiple Prosite motifs searching
+
+=back
+
+=head1 SYNOPSIS
+
+=over 4
+
+=item B<sig> [options] E<lt>F<file>E<gt> ...
+
+=back
+
+=head1 DESCRIPTION
+
+B<sig> is a program to search multiple occurences of multiple motifs
+in a set of sequences.
+
+=head1 OPTIONS
+
+Following command line options are allowed:
+
+=over 4
+
+=item -f F<file>
+
+Reads pattern definition from file. See syntax definition below.
+
+=item -h
+
+Usage display.
+
+=item -i
+
+Allows motifs from pattern to be overlapping. By default motifs are
+searched in a non overlapping way.
+
+=item -o F<file>
+
+Places the output into F<file>.
+
+=item -p F<pattern>
+
+Searches pattern F<pattern> in F<file>.
+
+=item -r
+
+Searches motifs in ordered and reverse search order, conserving the
+distance constraints.
+
+=item -v
+
+Displays the version number.
+
+=back
+
+=head1 FORMAT
+
+B<sig> only handles fasta sequence format as input.
+
+B<sig> takes what we call a pattern as search argument.
+
+A pattern consists in motifs definition separated by distance
+constraints. The format is strictly the following
+'motif_1 (min,max) motif_2 ... (min,max) motif_n' and so on.
+
+Motifs definition should be given in PROSITE syntax, for the complete
+syntax definition refer to
+E<lt>URL:http://www.expasy.ch/tools/scanprosite/scanprosite-doc.html#pattern_syntax<gt>
+
+Why this pattern syntax, why not just use the Prosite syntax to define
+complex motifs ?
+
+This is particulary useful, when you are looking for at least 3
+different motifs. eg for example consider the following "atomic"
+motifs B<A>, B<B> and B<C>.
+
+Prosite syntax allow you to define the following "super motif"
+A-x(n1,m1)-B-x(n2,m2)-C. but this "supermotif" is considered as ONE
+unique motif, while with the pattern definition, the "atomic motifs"
+still searched in an atomic way.
+
+This means that a sequence presenting the following motif succession
+Nter---B<A>---B<A>---B<B>--B<C>---Cter matches the 2 patterns.
+
+
+Distance constraints are given in the following form B<(min,max)>
+where B<min> and B<max> respectively define the minimal and maximal
+gap length requested between 2 motifs.
+
+B<Note> that if B<min>=0 (zero), no minimal gap length constraint is
+set. If B<max>=0 (zero) or absent, no maximal gap length constraint is
+set, meaning that gap length could be considered as infinite.
+
+B<motif examples>
+
+=over 4
+
+=item 'R-P-V-Y-F'
+
+matches only with motif RPVYF
+
+=item 'R-x-V-Y-F'
+
+matches motif RxVYF where x is any amino acid.
+
+=item '[RK]-x-V-x-[FW]'
+
+matches motif (R or K)xVx(F or W) where x is any amino acid.
+
+=item '[RK]-x(0,1)-V-F'
+
+matches motif (R or K)xV(F or W) where x is any amino acid represented
+0 or 1 times.
+
+=back
+
+B<pattern examples>
+
+=over 4
+
+=item '[RK]-x-V-x-[FW] (0,) F-x-x-[RK]-x-[RK]'
+
+no distance constraints are set between motif [RK]-X-V-X-[FW] and
+motif F-X-X-[RK]-X-[RK]
+
+=item  '[RK]-x-V-x-[FW] (5,15) F-X-X-[RK]-X-[RK]'
+
+motif [RK]-X-V-X-[FW] and motif F-X-X-[RK]-X-[RK] should be separated
+by a gap whose length is longer or equal to 5 and shorter or equal to
+15.
+
+=back
+
+Pattern file must respect one of the following forms and may contain
+comment lines.
+Lines beginning with a '#' are comments
+
+Pattern file must contain one and only one pattern definition.
+
+# pattern syntax 1
+
+motif_one<newline>
+distance_definition<newline>
+motif_two<newline>
+
+# pattern syntax 2
+
+motif_one distance_definition motif_two
+
+=head1 EXAMPLES
+
+=over 4
+
+=item sig -p 'A-B-C-D (0,) E-F-G' bar
+
+Will scan fasta formated sequences from file bar, for specified motifs
+with no distance constraints and display the motifs found.
+
+=item sig -o results -p 'A-B-C-D (0,) E-F-G' bar
+
+Same as previous, except that results will be written to file results
+instead of displayed on standard output (stdout).
+
+=item sig -p 'A-B-C-D (15,25) E-F-G' bar
+
+Will scan sequences from file bar, and display the motifs found with
+the requested distance constraints. Motif one and motif two should be
+separated by a gap whose length is E<gt>=15 and E<lt>=25.
+
+=item sig -r -p 'A-B-C-D (15,25) E-F-G' bar
+
+Same as previous, but also searches for motif E-F-G followed by motif
+A-B-C-D with the same distance constraints. ie motif E-F-G and motif
+A-B-C-D should be separated by a gap whose length is E<gt>=15 and
+E<lt>=25.
+
+=item sig -i -p  'A-B-x-x (0,) E-F-G' bar
+
+Will scan sequences from file bar, and display the motifs found
+allowing them to be overlapping. ie ABCD--EFG and ABEFG are taken in
+account.
+
+CAUTION: in this case distance constraints are ignored, as it makes no
+sense to speak about distances. With this option, we no longer check
+for distance, but for positions.
+
+=item cat bar | sig -i -p  'A-B-x-x (0,) E-F-G' -
+
+Same as previous, except that data are read from standard input
+(stdin).
+
+=back
+
+=head1 AUTHOR
+
+Eric Deveaud E<lt>edeveaud@pasteur.frE<gt>, Institut Pasteur.

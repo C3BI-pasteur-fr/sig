@@ -1,0 +1,22 @@
+2008-05-16  Eric Deveaud  <edeveaud@firfin.sis.pasteur.fr>
+	
+	* src/new_parse.c: fix problem while reading pattern
+	description form file not \n terminated.
+
+	* doc/sig.pod: changed URL for prosite format description. 
+	
+2006-05-17  Nicolas Joly  <njoly@pasteur.fr>
+
+	* doc/sig.pod: Small spelling/formatting fixes. Move description
+	section upper (after the synopsis).
+
+2006-05-16  Nicolas Joly  <njoly@pasteur.fr>
+
+	* src/error.[ch] : Add const where appropriate.
+
+	* test/*.sh: New verbose mode, enabled with `VERBOSE=x'.
+
+2002-05-17  Eric Deveaud  <edeveaud@pasteur.fr>
+
+	* src/main.c: first release
+
